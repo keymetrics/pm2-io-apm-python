@@ -82,13 +82,6 @@ class Transporter:
   def send(self, channel, obj):
     if not self.opened:
       return
-    print({
-      'channel': channel,
-      'payload': {
-        'data': obj,
-        'internal_ip': 'localhost'
-      }
-    })
     self.ws.send(json.dumps({
       'channel': channel,
       'payload': {

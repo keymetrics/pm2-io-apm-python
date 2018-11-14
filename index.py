@@ -7,6 +7,7 @@ from services import transport
 from services import status
 from services import metrics
 from services import actions
+from services import profiling
 
 import time
 import threading
@@ -36,6 +37,8 @@ def randomMetric(metric):
 def start(config):
   m = metrics.Metrics()
   a = actions.Actions()
+  p = profiling.Profiling()
+  p.start()
 
   t = transport.Transporter(config, a)
   t.getServer()
@@ -51,6 +54,7 @@ def start(config):
   m.addMetric(myMetric)
   a.addAction(myAction)
   threading.Thread(target=randomMetric, args=(myMetric,)).start()
+  p.stop()
 
   
 
