@@ -11,8 +11,6 @@ class Actions:
     return actions
 
   def callAction(self, actionName, data):
-    print("searching action " + actionName)
     for action in self.actions:
       if (action.getName() == actionName):
-        print("got")
         return action.callback(data)

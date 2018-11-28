@@ -3,6 +3,7 @@ from urllib.request import Request, urlopen
 import websocket
 import json
 import time
+import datetime
 
 class Transporter:
   opened = False
@@ -27,14 +28,10 @@ class Transporter:
       a = urlopen(req).read()
       res = json.loads(a)
       self.endpoint = res['endpoints']['ws']
-      print("endpoint:", self.endpoint)
-    except urllib.error.HTTPError as e:
-      print(e.read())
+    except urllib.error.HTTPError:
+      pass
 
   def connect(self):
-    print('Connecting to endpoint', self.endpoint)
-    #websocket.enableTrace(True)
-    #self.endpoint = "ws://localhost:8080/"
     self.ws = websocket.WebSocketApp(self.endpoint, header={
       'X-KM-PUBLIC': self.config.publicKey,
       'X-KM-SECRET': self.config.privateKey,
@@ -49,23 +46,18 @@ class Transporter:
     self.ws.run_forever()
 
   def wsOnOpen(self):
-    print('Opened')
     self.opened = True
 
   def wsOnMessage(self, message):
     # parse
     data = json.loads(message)
-    print(data)
     if (data['channel'] == 'trigger:action'):
-      print(self.actionService.getActions())
-      print("Call action " + data['payload']['action_name'])
       self.send("trigger:action:success", {
         'success': True,
         'id': data['payload']['process_id'],
         'action_name': data['payload']['action_name']
       })
       ret = self.actionService.callAction(data['payload']['action_name'], data['payload']['opts'])
-      print("Sending " + ret + " to server")
       self.send("axm:reply", {
         'action_name': data['payload']['action_name'],
         'return': ret
@@ -79,31 +71,33 @@ class Transporter:
           }
         }
       }))
-    print(message)
 
   def wsOnError(self, error):
-    print('WS error')
-    print(error)
+    self.opened = False
 
   def wsOnClose(self):
-    print('### closed')
+    self.opened = False
+    self.connect()
 
   def send(self, channel, obj):
     if not self.opened:
       return
-    self.ws.send(json.dumps({
-      'channel': channel,
-      'payload': {
-        'at': int(round(time.time() * 1000)),
-        'data': obj,
-        'process': {
-          'pm_id': 0,
-          'name': self.config.name,
-          'server': self.config.serverName,
-          'rev': None
-        },
-        'server_name': self.config.serverName,
-        'protected': False,
-        'internal_ip': 'WIP'
-      }
-    }))
+    try:
+      self.ws.send(json.dumps({
+        'channel': channel,
+        'payload': {
+          'at': int(round(time.time() * 1000)),
+          'data': obj,
+          'process': {
+            'pm_id': 0,
+            'name': self.config.name,
+            'server': self.config.serverName,
+            'rev': None
+          },
+          'server_name': self.config.serverName,
+          'protected': False,
+          'internal_ip': 'WIP'
+        }
+      }))
+    except (ConnectionResetError):
+      pass

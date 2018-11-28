@@ -86,7 +86,6 @@ class Status:
   def __init__(self, config, metricService, actionService):
     process = psutil.Process(os.getpid())
 
-    print('init status')
     self.data['process'][0]['name'] = config.name
     self.data['process'][0]['memory'] = process.memory_info().rss
     self.data['process'][0]['cpu'] = process.cpu_percent(1)
@@ -100,4 +99,3 @@ class Status:
 
     self.data['process'][0]['axm_monitor'] = metricService.getMetrics()
     self.data['process'][0]['axm_actions'] = actionService.getActions()
-    print('initied status')
