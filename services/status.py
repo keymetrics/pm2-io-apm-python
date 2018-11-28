@@ -18,7 +18,7 @@ class Status:
     "process": [
       {
         "pid": os.getpid(),
-        "name": "Python App",
+        "name": "Python App", # init
         "server": "",
         "interpreter": sys.executable,
         "created_at": 0, # init
@@ -83,10 +83,11 @@ class Status:
     }
   }
 
-  def __init__(self, metricService, actionService):
+  def __init__(self, config, metricService, actionService):
     process = psutil.Process(os.getpid())
 
     print('init status')
+    self.data['process'][0]['name'] = config.name
     self.data['process'][0]['memory'] = process.memory_info().rss
     self.data['process'][0]['cpu'] = process.cpu_percent(1)
     self.data['process'][0]['created_at'] = start_time * 1000

@@ -70,6 +70,15 @@ class Transporter:
         'action_name': data['payload']['action_name'],
         'return': ret
       })
+    elif (data['channel'] == 'trigger:pm2:action'):
+      self.ws.send(json.dumps({
+        'channel': 'trigger:pm2:result',
+        'payload': {
+          'ret': {
+            'err': None
+          }
+        }
+      }))
     print(message)
 
   def wsOnError(self, error):
@@ -85,12 +94,16 @@ class Transporter:
     self.ws.send(json.dumps({
       'channel': channel,
       'payload': {
+        'at': int(round(time.time() * 1000)),
         'data': obj,
         'process': {
           'pm_id': 0,
           'name': self.config.name,
-          'server': self.config.serverName
+          'server': self.config.serverName,
+          'rev': None
         },
-        'internal_ip': 'localhost'
+        'server_name': self.config.serverName,
+        'protected': False,
+        'internal_ip': 'WIP'
       }
     }))

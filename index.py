@@ -7,7 +7,6 @@ from services import transport
 from services import status
 from services import metrics
 from services import actions
-from services import profiling
 
 import time
 import threading
@@ -15,9 +14,14 @@ import random
 import os
 import json
 
-def statusInterval(t, m, a):
+def statusInterval(config, t, m, a):
   while (True):
-    t.send('status', status.Status(m, a).data)
+    t.send('status', status.Status(config, m, a).data)
+
+def loopLog(t):
+  while (True):
+    time.sleep(2)
+    t.send('logs', 'I am eating cats')
 
 def cpuLoop():
   i = 0
@@ -37,13 +41,12 @@ def randomMetric(metric):
 def start(config):
   m = metrics.Metrics()
   a = actions.Actions()
-  p = profiling.Profiling()
-  p.start()
 
   t = transport.Transporter(config, a)
   t.getServer()
   threading.Thread(target=t.connect).start()
-  threading.Thread(target=statusInterval, args=(t,m,a,)).start()
+  threading.Thread(target=statusInterval, args=(config, t,m,a,)).start()
+  threading.Thread(target=loopLog, args=(t,)).start()
 
   #threading.Thread(target=cpuLoop).start()
   time.sleep(2)
@@ -54,7 +57,6 @@ def start(config):
   m.addMetric(myMetric)
   a.addAction(myAction)
   threading.Thread(target=randomMetric, args=(myMetric,)).start()
-  p.stop()
 
   
 
