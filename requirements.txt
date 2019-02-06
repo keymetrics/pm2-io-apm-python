@@ -1,3 +1,4 @@
 psutil==5.4.8
 py-cpuinfo==4.0.0
 websocket-client==0.54.0
+opencensus==0.2.0

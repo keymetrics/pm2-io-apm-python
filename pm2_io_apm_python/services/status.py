@@ -6,8 +6,6 @@ import time
 import platform
 import cpuinfo
 
-from . import metrics
-
 start_time = time.time()
 memory = psutil.virtual_memory().total
 

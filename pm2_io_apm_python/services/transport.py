@@ -14,7 +14,7 @@ class Transporter:
     self.actionService = actionService
 
   def getServer(self):
-    req = Request('https://' + self.config.node + '/api/node/verifyPM2', bytearray(json.dumps({
+    req = Request(self.config.node + '/api/node/verifyPM2', bytearray(json.dumps({
       'public_id': self.config.publicKey,
       'private_id': self.config.privateKey,
       'data': {
@@ -28,7 +28,10 @@ class Transporter:
       a = urlopen(req).read()
       res = json.loads(a)
       self.endpoint = res['endpoints']['ws']
+      if not self.endpoint:
+        print("No endpoint available for this public/private key")
     except urllib.error.HTTPError:
+      print("No endpoint available for this public/private key")
       pass
 
   def connect(self):
@@ -79,25 +82,29 @@ class Transporter:
     self.opened = False
     self.connect()
 
-  def send(self, channel, obj):
+  def sendJson(self, obj):
+    print(json.dumps(obj))
     if not self.opened:
       return
     try:
-      self.ws.send(json.dumps({
-        'channel': channel,
-        'payload': {
-          'at': int(round(time.time() * 1000)),
-          'data': obj,
-          'process': {
-            'pm_id': 0,
-            'name': self.config.name,
-            'server': self.config.serverName,
-            'rev': None
-          },
-          'server_name': self.config.serverName,
-          'protected': False,
-          'internal_ip': 'WIP'
-        }
-      }))
+      self.ws.send(json.dumps(obj))
     except (ConnectionResetError):
       pass
+
+  def send(self, channel, obj):
+    self.sendJson({
+      'channel': channel,
+      'payload': {
+        'at': int(round(time.time() * 1000)),
+        'data': obj,
+        'process': {
+          'pm_id': 0,
+          'name': self.config.name,
+          'server': self.config.serverName,
+          'rev': None
+        },
+        'server_name': self.config.serverName,
+        'protected': False,
+        'internal_ip': 'WIP'
+      }
+    })

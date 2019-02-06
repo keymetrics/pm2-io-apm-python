@@ -9,6 +9,7 @@ from .classes import metric as mmetric
 from .classes import action as maction
 
 from .features import notifier
+from .features.tracing import tracing
 
 class Pm2Io:
   metricManager = mmetric
@@ -28,6 +29,9 @@ class Pm2Io:
 
     # init notifier
     self.notifier = notifier.Notifier(self.transporter)
+
+    # init tracing
+    self.tracing = tracing.Tracing(self.transporter)
 
   def start(self):
     # start status interval thread
