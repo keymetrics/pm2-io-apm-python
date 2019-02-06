@@ -83,7 +83,6 @@ class Transporter:
     self.connect()
 
   def sendJson(self, obj):
-    print(json.dumps(obj))
     if not self.opened:
       return
     try:

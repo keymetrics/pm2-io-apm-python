@@ -46,7 +46,6 @@ class Pm2Io:
     threading.Thread(target=self.transporter.connect).start()
 
   def stop(self):
-    print('stopping')
     # stop threads
 
   def statusInterval(self, config, t, m, a):
