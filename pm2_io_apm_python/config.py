@@ -8,7 +8,7 @@ class Config:
   version = "0.0.1"
   node = ""
 
-  def __init__(self, public, private, name, node = "api.cloud.pm2.io"):
+  def __init__(self, public, private, name, node = "https://api.cloud.pm2.io"):
     self.publicKey = public
     self.privateKey = private
     self.name = name
