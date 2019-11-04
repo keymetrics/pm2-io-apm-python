@@ -28,3 +28,7 @@ randMetric.setValue(random.randint(1, 1000))
 ```python
 pm2.notifier.log("Completely started")
 ```
+
+## License
+
+Commercial
